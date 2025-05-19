@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C9ECB3FE2DD4355A006DEED6 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C9ECB3FD2DD4355A006DEED6 /* FirebaseAnalytics */; };
+		C9ECB4002DD4355A006DEED6 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = C9ECB3FF2DD4355A006DEED6 /* FirebaseAppCheck */; };
+		C9ECB4022DD4355A006DEED6 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C9ECB4012DD4355A006DEED6 /* FirebaseCore */; };
+		C9ECB4042DD4355A006DEED6 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = C9ECB4032DD4355A006DEED6 /* FirebaseMessaging */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C9ECB3EA2DD434A1006DEED6 /* opakunew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = opakunew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +30,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C9ECB4042DD4355A006DEED6 /* FirebaseMessaging in Frameworks */,
+				C9ECB4002DD4355A006DEED6 /* FirebaseAppCheck in Frameworks */,
+				C9ECB4022DD4355A006DEED6 /* FirebaseCore in Frameworks */,
+				C9ECB3FE2DD4355A006DEED6 /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +76,10 @@
 			);
 			name = opakunew;
 			packageProductDependencies = (
+				C9ECB3FD2DD4355A006DEED6 /* FirebaseAnalytics */,
+				C9ECB3FF2DD4355A006DEED6 /* FirebaseAppCheck */,
+				C9ECB4012DD4355A006DEED6 /* FirebaseCore */,
+				C9ECB4032DD4355A006DEED6 /* FirebaseMessaging */,
 			);
 			productName = opakunew;
 			productReference = C9ECB3EA2DD434A1006DEED6 /* opakunew.app */;
@@ -94,6 +109,9 @@
 			);
 			mainGroup = C9ECB3E12DD434A0006DEED6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C9ECB3EB2DD434A1006DEED6 /* Products */;
 			projectDirPath = "";
@@ -251,6 +269,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = opakunew/opakunew.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F7X5JSB37B;
@@ -261,6 +280,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -279,6 +299,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = opakunew/opakunew.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F7X5JSB37B;
@@ -289,6 +310,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -324,6 +346,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C9ECB3FD2DD4355A006DEED6 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C9ECB3FF2DD4355A006DEED6 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		C9ECB4012DD4355A006DEED6 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		C9ECB4032DD4355A006DEED6 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C9ECB3FC2DD4355A006DEED6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C9ECB3E22DD434A1006DEED6 /* Project object */;
 }

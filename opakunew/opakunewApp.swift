@@ -1,15 +1,17 @@
 //
-//  opakunewApp.swift
-//  opakunew
+//  opakuApp.swift
+//  opaku
 //
-//  Created by Figo Alsistani on 14/05/25.
+//  Created by Figo Alsistani on 28/04/25.
 //
 
 import SwiftUI
 import SwiftData
 
+
 @main
 struct opakunewApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -25,7 +27,9 @@ struct opakunewApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                ContentView()
+            }
         }
         .modelContainer(sharedModelContainer)
     }
