@@ -1,13 +1,6 @@
-//
-//  AppDelegate.swift
-//  opaku
-//
-//  Created by Figo Alsistani on 09/05/25.
-//
 import UIKit
-import FirebaseCore
+import Firebase
 import FirebaseMessaging
-import FirebaseAnalytics
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -25,13 +18,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set delegate untuk Firebase Messaging
         Messaging.messaging().delegate = self
         Messaging.messaging().subscribe(toTopic: "promoMay")
-        Analytics.logEvent("item_purchased", parameters: [
-              "item_id": "product_123",
-              "item_name": "Awesome T-Shirt",
-              "item_category": "Apparel",
-              "price": 25.99 as NSObject, // Values need to be of type NSObject
-              "quantity": 1 as NSObject
-            ])
+//        Analytics.logEvent("item_purchased", parameters: [
+//              "item_id": "product_123",
+//              "item_name": "Awesome T-Shirt",
+//              "item_category": "Apparel",
+//              "price": 25.99 as NSObject, // Values need to be of type NSObject
+//              "quantity": 1 as NSObject
+//            ])
         return true
     }
     
@@ -89,6 +82,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         let userInfo = response.notification.request.content.userInfo
         print("ℹ️ Pengguna berinteraksi dengan notifikasi: \(userInfo)")
         // Tambahkan logic untuk menangani aksi notifikasi di sini
+        
+        Analytics.logEvent("ini_custom_notification", parameters: [
+              "item_id": "product_123",
+              "item_name": "Awesome T-Shirt",
+              "item_category": "Apparel",
+              "price": 25.99 as NSObject, // Values need to be of type NSObject
+              "quantity": 1 as NSObject
+            ])
 
         completionHandler()
     }
@@ -111,4 +112,3 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 extension Notification.Name {
     static let didReceiveFCMToken = Notification.Name("didReceiveFCMToken")
 }
-
