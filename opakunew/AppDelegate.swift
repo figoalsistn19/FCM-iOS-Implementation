@@ -7,6 +7,7 @@
 import UIKit
 import FirebaseCore
 import FirebaseMessaging
+import FirebaseAnalytics
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -24,9 +25,48 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Set delegate untuk Firebase Messaging
         Messaging.messaging().delegate = self
         Messaging.messaging().subscribe(toTopic: "promoMay")
-        
+        Analytics.logEvent("item_purchased", parameters: [
+              "item_id": "product_123",
+              "item_name": "Awesome T-Shirt",
+              "item_category": "Apparel",
+              "price": 25.99 as NSObject, // Values need to be of type NSObject
+              "quantity": 1 as NSObject
+            ])
         return true
     }
+    
+    func application(_ application: UIApplication,
+                         didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+                         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+            
+            print("Notifikasi remote diterima (mungkin di background): \(userInfo)")
+
+            // --- LOG CUSTOM EVENT ANALYTICS ---
+            // Cek apakah ini bukan duplikat dari `userNotificationCenter` jika notifikasi juga visible
+            // Misalnya, jika Anda HANYA ingin log silent push di sini
+            let isSilentPush = (userInfo["aps"] as? [String: AnyObject])?["content-available"] as? Int == 1
+            
+            // Anda bisa menambahkan logika untuk hanya log jika ini adalah silent push,
+            // atau jika Anda ingin melacak semua penerimaan data di background.
+            // Untuk contoh ini, kita log setiap kali metode ini dipanggil.
+            
+            var eventParams: [String: Any] = [
+                "trigger_point": "background_data_receive",
+                "is_silent_push": isSilentPush,
+                AnalyticsParameterContentType: "notification"
+            ]
+            if let notificationId = userInfo["gcm.message_id"] as? String {
+                eventParams["notification_id"] = notificationId
+            }
+            if let customData = userInfo["custom_key"] as? String {
+                eventParams["custom_payload_data"] = customData
+            }
+            
+            Analytics.logEvent("notification_processed", parameters: eventParams)
+            print("Analytics event 'notification_processed' (background data) logged.")
+            
+            completionHandler(.newData) // atau .noData / .failed
+        }
 
     // MARK: - UNUserNotificationCenterDelegate (Untuk notifikasi foreground)
     // Dipanggil ketika notifikasi diterima saat aplikasi berada di foreground
