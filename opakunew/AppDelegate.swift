@@ -49,6 +49,19 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 "quantity": 1
             ]
         )
+        
+        // How to used Analytic Manager
+        AnalyticsManager.shared.logEvent(
+                eventName: "item_purchased",
+                parameters: [
+                    "item_id": "product_123",
+                    "item_name": "Awesome T-Shirt",
+                    "item_category": "Apparel",
+                    "price": 25.99,
+                    "quantity": 1
+                ]
+            )
+        
         return true
     }
 
