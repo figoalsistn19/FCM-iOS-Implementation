@@ -62,7 +62,47 @@ struct ContentView: View {
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
-
+                Text("List of blocked event: \n- purchased \n- item_view")
+                    .font(.caption)
+                    .padding(.top)
+                Text("Unlock GA4 for refund event:")
+                    .font(.caption)
+                    .padding(.top)
+                Button("refund") {
+                    AnalyticsManager.shared.logEvent(
+                        eventName: "refund",
+                        parameters: [
+                            "item_id": "product_123",
+                            "item_name": "Awesome T-Shirt",
+                            "item_category": "Apparel",
+                            "price": 25.99,
+                            "quantity": 1
+                        ]
+                    )
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                Text("purchased")
+                .font(.caption)
+                .padding(.top)
+                Button("purchased") {
+                    AnalyticsManager.shared.logEvent(
+                        eventName: "purchased",
+                        parameters: [
+                            "item_id": "product_123",
+                            "item_name": "Awesome T-Shirt",
+                            "item_category": "Apparel",
+                            "price": 25.99,
+                            "quantity": 1
+                        ]
+                    )
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
 
                 if let errorMessage = notificationService.errorMessage {
                     Text("Error: \(errorMessage)")

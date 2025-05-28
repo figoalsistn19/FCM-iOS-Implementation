@@ -17,12 +17,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // Properti untuk menyimpan token (opsional, bisa juga dikelola di NotificationService)
     var fcmTokenString: String?
     var window: UIWindow?
+    var ga4Blacklist: [String] = []
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Konfigurasi Firebase
         FirebaseApp.configure()
-
+            _ = AnalyticsManager.shared
         // Set delegate untuk UserNotifications
         UNUserNotificationCenter.current().delegate = self
 
@@ -51,19 +52,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         )
         
         // How to used Analytic Manager
-        AnalyticsManager.shared.logEvent(
-                eventName: "item_purchased",
-                parameters: [
-                    "item_id": "product_123",
-                    "item_name": "Awesome T-Shirt",
-                    "item_category": "Apparel",
-                    "price": 25.99,
-                    "quantity": 1
-                ]
-            )
-        
+//        AnalyticsManager.shared.logEvent(
+//            eventName: "item_purchased",
+//            parameters: [
+//                "item_id": "product_123",
+//                "item_name": "Awesome T-Shirt",
+//                "item_category": "Apparel",
+//                "price": 25.99,
+//                "quantity": 1
+//            ]
+//        )
         return true
     }
+    
+    
 
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification userInfo: [AnyHashable : Any],
