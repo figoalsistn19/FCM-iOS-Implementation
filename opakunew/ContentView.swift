@@ -69,16 +69,18 @@ struct ContentView: View {
                     .font(.caption)
                     .padding(.top)
                 Button("refund") {
-                    AnalyticsManager.shared.logEvent(
-                        eventName: "refund",
-                        parameters: [
-                            "item_id": "product_123",
-                            "item_name": "Awesome T-Shirt",
-                            "item_category": "Apparel",
-                            "price": 25.99,
-                            "quantity": 1
-                        ]
-                    )
+                    Task {
+                                    await AnalyticsManager.shared.logEvent(
+                                        eventName: "refund",
+                                        parameters: [
+                                            "item_id": "product_123",
+                                            "item_name": "Awesome T-Shirt",
+                                            "item_category": "Apparel",
+                                            "price": 25.99,
+                                            "quantity": 1
+                                        ]
+                                    )
+                                }
                 }
                 .padding()
                 .background(Color.blue)
@@ -88,16 +90,18 @@ struct ContentView: View {
                 .font(.caption)
                 .padding(.top)
                 Button("purchased") {
-                    AnalyticsManager.shared.logEvent(
-                        eventName: "purchased",
-                        parameters: [
-                            "item_id": "product_123",
-                            "item_name": "Awesome T-Shirt",
-                            "item_category": "Apparel",
-                            "price": 25.99,
-                            "quantity": 1
-                        ]
-                    )
+                    Task {
+                                    await AnalyticsManager.shared.logEvent(
+                                        eventName: "purchased",
+                                        parameters: [
+                                            "item_id": "product_123",
+                                            "item_name": "Awesome T-Shirt",
+                                            "item_category": "Apparel",
+                                            "price": 25.99,
+                                            "quantity": 1
+                                        ]
+                                    )
+                                }
                 }
                 .padding()
                 .background(Color.blue)

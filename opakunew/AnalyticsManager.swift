@@ -4,28 +4,31 @@ import AmplitudeSwift
 import FirebaseFirestore
 
 class AnalyticsManager {
-
+    
     static let shared = AnalyticsManager()
     private let sharedAmplitude: Amplitude
     public private(set) var blackListGA4: [String] = []
-
+    private var blacklistLoadingTask: Task<Void, Never>?
+    
     private init() {
         self.sharedAmplitude = Amplitude(configuration: Configuration(apiKey: "YOUR_AMPLITUDE_API_KEY"))
-        Task {
+        self.blacklistLoadingTask = Task {
             await loadBlacklist()
         }
     }
-
+    
     private func loadBlacklist() async {
         do {
             self.blackListGA4 = try await fetchBlockedEvent()
-            print("the event", blackListGA4)
+            print("The blocked events: ", blackListGA4)
         } catch {
             self.blackListGA4 = []
         }
     }
-
-    func logEvent(eventName: String, parameters: [String: Any]) {
+    
+    func logEvent(eventName: String, parameters: [String: Any]) async {
+        await blacklistLoadingTask?.value
+        
         if !blackListGA4.contains(eventName) {
             print("The event '\(eventName)' will be pushed to GA4")
             var firebaseParams: [String: Any] = [:]
@@ -48,7 +51,7 @@ class AnalyticsManager {
         } else {
             print("The event '\(eventName)' is on the GA4 blacklist and will NOT be pushed to GA4.")
         }
-
+        
         self.sharedAmplitude.track(eventType: eventName, eventProperties: parameters)
         print("The event '\(eventName)' will be pushed to Amplitude")
     }
@@ -59,14 +62,13 @@ func fetchBlockedEvent() async throws -> [String] {
     let documentID = "blockedEvent"
     let fieldName = "eventName"
     let documentRef = db.collection("BlockedEvents").document(documentID)
-
+    
     do {
         let documentSnapshot = try await documentRef.getDocument()
-
         guard documentSnapshot.exists else {
             return []
         }
-
+        
         if let data = documentSnapshot.data(),
            let eventNamesArray = data[fieldName] as? [String] {
             return eventNamesArray
