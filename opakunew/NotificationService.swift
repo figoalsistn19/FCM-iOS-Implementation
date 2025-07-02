@@ -29,6 +29,7 @@ class NotificationService: ObservableObject {
     
     @objc private func updateFCMToken(_ notification: Notification) {
         if let token = notification.userInfo?["token"] as? String {
+            print("token: ", token)
             DispatchQueue.main.async {
                 self.fcmToken = token
                 self.errorMessage = nil

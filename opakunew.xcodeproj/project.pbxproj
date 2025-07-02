@@ -24,9 +24,22 @@
 		C9ECB3EA2DD434A1006DEED6 /* opakunew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = opakunew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C8D074FA2E152F2700214BA3 /* Exceptions for "opakunew" folder in "opakunew" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C9ECB3E92DD434A1006DEED6 /* opakunew */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C9ECB3EC2DD434A1006DEED6 /* opakunew */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C8D074FA2E152F2700214BA3 /* Exceptions for "opakunew" folder in "opakunew" target */,
+			);
 			path = opakunew;
 			sourceTree = "<group>";
 		};
@@ -297,6 +310,8 @@
 				DEVELOPMENT_TEAM = F7X5JSB37B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = opakunew/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -327,6 +342,8 @@
 				DEVELOPMENT_TEAM = F7X5JSB37B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = opakunew/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

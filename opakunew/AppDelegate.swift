@@ -1,10 +1,11 @@
 import UIKit
-import FirebaseCore // For FirebaseApp.configure()
+import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
 import AmplitudeSwift
 import FirebaseRemoteConfig
-import FirebaseAnalytics // Explicitly import FirebaseAnalytics for constants like AnalyticsParameterContentType
+import FirebaseAnalytics // Make sure this is imported
+import FirebaseInstallations
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
 
@@ -38,9 +39,46 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
 
         Messaging.messaging().delegate = self
-        Messaging.messaging().subscribe(toTopic: "promoMay")
+
+        Installations.installations().installationID { (id, error) in
+            if let error = error {
+                print("Error getting installation ID: \(error.localizedDescription)")
+                return
+            }
+            if let id = id {
+                print("Instance ID for testing: \(id)")
+            }
+        }
+
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: authOptions,
+            completionHandler: { granted, error in
+                if let error = error {
+                    print("Error requesting APNS authorization: \(error.localizedDescription)")
+                }
+                guard granted else {
+                    print("User denied notification permissions.")
+                    return
+                }
+                print("User granted notification permissions.")
+                DispatchQueue.main.async {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        )
 
         return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        print("✅ APNS device token received: \(tokenString)")
+        Messaging.messaging().apnsToken = deviceToken
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("❌ Failed to register for remote notifications with error: \(error.localizedDescription)")
     }
 
     func application(_ application: UIApplication,
@@ -51,7 +89,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         let isSilentPush = (userInfo["aps"] as? [String: AnyObject])?["content-available"] as? Int == 1
 
-        // Safely convert userInfo to [String: Any]
         var eventParams: [String: Any] = userInfo.reduce(into: [String: Any]()) { result, entry in
             if let key = entry.key as? String {
                 result[key] = entry.value
@@ -60,18 +97,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         eventParams["trigger_point"] = "background_data_receive"
         eventParams["is_silent_push"] = isSilentPush
-        // Use AnalyticsParameterContentType correctly if the key truly is a string
         eventParams[AnalyticsParameterContentType] = "notification"
-
-
-        // You already have if let customData, no need to redefine
-        // if let notificationId = userInfo["gcm.message_id"] as? String {
-        //     eventParams["notification_id"] = notificationId
-        // }
-        // if let customData = userInfo["custom_key"] as? String {
-        //     eventParams["custom_payload_data"] = customData
-        // }
-
 
         Task {
             await AnalyticsManager.shared.logEvent(eventName: "notification_processed", parameters: eventParams)
@@ -88,7 +114,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         completionHandler([[.alert, .sound, .badge]])
 
-        // Safely convert userInfo to [String: Any] for logging
         let loggableUserInfo: [String: Any] = userInfo.reduce(into: [String: Any]()) { result, entry in
             if let key = entry.key as? String {
                 result[key] = entry.value
@@ -123,12 +148,51 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
+    // Modified method to send FCM token to GA4
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("✅ FCM registration token: \(String(describing: fcmToken))")
         self.fcmTokenString = fcmToken
 
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
         NotificationCenter.default.post(name: .didReceiveFCMToken, object: nil, userInfo: dataDict)
+
+        // Log FCM token to GA4
+        if let token = fcmToken {
+            var params: [String: Any] = [:]
+            let chunkSize = 100 // Maximum characters per parameter
+
+            // Split the token into chunks
+            var currentIndex = 0
+            var chunkIndex = 0
+            while currentIndex < token.count {
+                let startIndex = token.index(token.startIndex, offsetBy: currentIndex)
+                let endIndex = token.index(startIndex, offsetBy: min(chunkSize, token.count - currentIndex))
+                let chunk = String(token[startIndex..<endIndex])
+                params["token\(chunkIndex+1)"] = chunk
+
+                currentIndex += chunkSize
+                chunkIndex += 1
+            }
+            
+            print("PARAMM: ", params)
+
+            // You'll need to use your AnalyticsManager to log this event
+            Task {
+                await AnalyticsManager.shared.logEvent(eventName: "fcm_token", parameters: params)
+                print("AnalyticsManager logged 'token_receive' event to GA4 with token chunks.")
+            }
+
+            // Subscribe to topic here
+            Messaging.messaging().subscribe(toTopic: "promoMay") { error in
+                if let error = error {
+                    print("Error subscribing to topic 'promoMay': \(error.localizedDescription)")
+                } else {
+                    print("Subscribed to topic 'promoMay' successfully with token: \(token)")
+                }
+            }
+        } else {
+            print("FCM token is nil, not logging to GA4 or subscribing to topic.")
+        }
     }
 }
 
