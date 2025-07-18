@@ -6,5 +6,27 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>fb3308747519281317</string>
+      </array>
+      </dict>
+    </array>
+    <key>FacebookAppID</key>
+    <string>3308747519281317</string>
+    <key>FacebookClientToken</key>
+    <string>7e35ea453e4e6fb222b85394986d5d4b</string>
+    <key>FacebookDisplayName</key>
+    <string>Asteriks</string>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>fbapi</string>
+      <string>fb-messenger-share-api</string>
+    </array>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>This allows us to provide a better ad experience and measure analytics.</string>
 </dict>
 </plist>

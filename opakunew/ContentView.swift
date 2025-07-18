@@ -1,12 +1,7 @@
-//
-//  ContentView.swift
-//  opaku
-//
-//  Created by Figo Alsistani on 28/04/25.
-//
-
 import SwiftUI
 import SwiftData
+import FBSDKCoreKit
+import AppTrackingTransparency
 
 struct ContentView: View {
     @StateObject private var notificationService = NotificationService()
@@ -62,51 +57,24 @@ struct ContentView: View {
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
-                Text("List of blocked event: \n- purchased \n- item_view")
-                    .font(.caption)
-                    .padding(.top)
-                Text("Unlock GA4 for refund event:")
-                    .font(.caption)
-                    .padding(.top)
-                Button("refund") {
-                    Task {
-                                    await AnalyticsManager.shared.logEvent(
-                                        eventName: "refund",
-                                        parameters: [
-                                            "item_id": "product_123",
-                                            "item_name": "Awesome T-Shirt",
-                                            "item_category": "Apparel",
-                                            "price": 25.99,
-                                            "quantity": 1
-                                        ]
-                                    )
-                                }
+                Button("Request Tracking Permission") {
+                    requestTrackingPermission()
                 }
                 .padding()
-                .background(Color.blue)
+                .background(Color.orange) // Warna berbeda agar mudah dikenali
                 .foregroundColor(.white)
                 .cornerRadius(8)
-                Text("purchased")
-                .font(.caption)
-                .padding(.top)
-                Button("purchased") {
-                    Task {
-                                    await AnalyticsManager.shared.logEvent(
-                                        eventName: "purchased",
-                                        parameters: [
-                                            "item_id": "product_123",
-                                            "item_name": "Awesome T-Shirt",
-                                            "item_category": "Apparel",
-                                            "price": 25.99,
-                                            "quantity": 1
-                                        ]
-                                    )
-                                }
+                // Tombol untuk navigasi ke ProductListView
+                NavigationLink(destination: ProductListView()) {
+                    Text("Lihat Daftar Produk")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(12)
                 }
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
 
                 if let errorMessage = notificationService.errorMessage {
                     Text("Error: \(errorMessage)")
@@ -117,10 +85,38 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Notification & Token")
+            .navigationTitle("Home Screen")
             .onAppear {
-                // Check status when view showed, if needed
-                // notificationService.checkNotificationAuthorizationStatus()
+                requestTrackingPermission()
+                
+                let eventName = "page"
+                let parameters: [AppEvents.ParameterName: Any] = [
+                    AppEvents.ParameterName("name"): "home screen"
+                ]
+                AppEvents.shared.logEvent(AppEvents.Name(eventName), parameters: parameters)
+                print("✅ DEBUG: Event '\(eventName)' dengan parameter \(parameters) telah dikirim ke Meta.")
+            }
+        }
+    }
+
+    // FUNGSI INI SEKARANG BERADA DI DALAM STRUCT
+    func requestTrackingPermission() {
+        // Beri jeda 1 detik untuk menghindari konflik dengan permintaan izin lain
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch status {
+                case .authorized:
+                    Settings.shared.isAdvertiserIDCollectionEnabled = true
+                    print("✅ ATT: Authorized")
+                case .denied:
+                    print("❌ ATT: Denied")
+                case .notDetermined:
+                    print("🤔 ATT: Not Determined")
+                case .restricted:
+                    print("🚫 ATT: Restricted")
+                @unknown default:
+                    print("🤷 ATT: Unknown")
+                }
             }
         }
     }
@@ -132,8 +128,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
-//#Preview {
-//    ContentView()
-//        .modelContainer(for: Item.self, inMemory: true)
-//}
