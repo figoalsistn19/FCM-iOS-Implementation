@@ -9,6 +9,8 @@ import FirebaseInstallations
 import FirebaseFirestore
 import FirebaseAuth
 import FBSDKCoreKit // <-- Facebook SDK Import
+import AppTrackingTransparency
+import AdSupport
 
 @objcMembers
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -27,17 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         
-        // MARK: - Facebook SDK Setup
-        // Enable debug logs to see detailed SDK activity in the console.
-        Settings.shared.enableLoggingBehavior(.developerErrors)
-        
-        // Initialize the Facebook SDK.
+        // Initialize the Facebook SDK first
         ApplicationDelegate.shared.application(
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-        
-        // MARK: - Other SDKs Setup
+
+        // Firebase setup
         FirebaseApp.configure()
         db = Firestore.firestore()
         
@@ -45,38 +43,114 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let settings = RemoteConfigSettings()
         settings.minimumFetchInterval = 0
         remoteConfig.configSettings = settings
-        
-        remoteConfig.setDefaults([
-            "firebase_blocked_events": "" as NSObject
-        ])
+        remoteConfig.setDefaults(["firebase_blocked_events": "" as NSObject])
         
         _ = AnalyticsManager.shared
-        
+
+        // Notification setup
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
-        
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
         UNUserNotificationCenter.current().requestAuthorization(
-            options: authOptions,
-            completionHandler: { granted, error in
-                if let error = error {
-                    print("Error requesting APNS authorization: \(error.localizedDescription)")
+            options: authOptions
+        ) { granted, error in
+            if let error = error {
+                print("Error requesting APNS authorization: \(error.localizedDescription)")
+            }
+            guard granted else {
+                print("User denied notification permissions.")
+                return
+            }
+            print("User granted notification permissions.")
+            DispatchQueue.main.async {
+                application.registerForRemoteNotifications()
+            }
+        }
+
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch status {
+                case .authorized:
+                    print("ATT Authorized")
+                    Settings.shared.isAdvertiserTrackingEnabled = true
+                case .denied, .notDetermined, .restricted:
+                    print("ATT Not Authorized")
+                    Settings.shared.isAdvertiserTrackingEnabled = false
+                @unknown default:
+                    break
                 }
-                guard granted else {
-                    print("User denied notification permissions.")
-                    return
-                }
-                print("User granted notification permissions.")
-                DispatchQueue.main.async {
-                    application.registerForRemoteNotifications()
+
+                Settings.shared.enableLoggingBehavior(.developerErrors)
+                Settings.shared.isAdvertiserIDCollectionEnabled = true
+                Settings.shared.isEventDataUsageLimited = false
+                Settings.shared.isAutoLogAppEventsEnabled = true
+
+                AppEvents.shared.userID = "test_user_id"
+                AppEvents.shared.setUserData("test@example.com", forType: .email)
+
+                AppEvents.shared.activateApp()
+            }
+        } else {
+            Settings.shared.isAdvertiserTrackingEnabled = true
+            Settings.shared.enableLoggingBehavior(.developerErrors)
+            Settings.shared.isAdvertiserIDCollectionEnabled = true
+            Settings.shared.isEventDataUsageLimited = false
+            Settings.shared.isAutoLogAppEventsEnabled = true
+
+            AppEvents.shared.userID = "test_user_id"
+            AppEvents.shared.setUserData("test@example.com", forType: .email)
+
+            AppEvents.shared.activateApp()
+        }
+
+        deepLinkHandler = DeepLinkHandler()
+        
+        func logPromotionClickEvents(products: [Product]) {
+            for (index, product) in products.enumerated() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 2.0) {
+                    let eventName = AppEvents.Name("product_promotion_clicked")
+                    
+                    let parameters: [AppEvents.ParameterName: Any] = [
+                        AppEvents.ParameterName("product_id"): product.id.uuidString,
+                        AppEvents.ParameterName("product_name"): product.name,
+                        AppEvents.ParameterName("original_price"): product.price,
+                        AppEvents.ParameterName("discounted_price"): product.price * 0.8, // 20% off
+                        AppEvents.ParameterName("currency"): "IDR",
+                        AppEvents.ParameterName("promo_name"): "Mid-Year Sale"
+                    ]
+                    
+                    AppEvents.shared.logEvent(eventName, parameters: parameters)
+                    print("📢 Promo event for '\(product.name)' sent.")
                 }
             }
-        )
+        }
         
-        deepLinkHandler = DeepLinkHandler()
+        struct Product {
+            let id: UUID
+            let name: String
+            let price: Double
+        }
+
+        let promotionalProducts = [
+            Product(id: UUID(), name: "Smartwatch Gen 5", price: 1500000),
+            Product(id: UUID(), name: "Bluetooth Speaker", price: 500000),
+            Product(id: UUID(), name: "Wireless Charger", price: 300000),
+            Product(id: UUID(), name: "Smartwatch Gen 5", price: 1500000),
+            Product(id: UUID(), name: "Bluetooth Speaker", price: 500000),
+            Product(id: UUID(), name: "Wireless Charger", price: 300000),
+            Product(id: UUID(), name: "Smartwatch Gen 5", price: 1500000),
+            Product(id: UUID(), name: "Bluetooth Speaker", price: 500000),
+            Product(id: UUID(), name: "Wireless Charger", price: 300000),
+            Product(id: UUID(), name: "Smartwatch Gen 5", price: 1500000),
+            Product(id: UUID(), name: "Bluetooth Speaker", price: 500000),
+            Product(id: UUID(), name: "Wireless Charger", price: 300000)
+        ]
+
+        logPromotionClickEvents(products: promotionalProducts)
         
         return true
     }
+
     
     // MARK: - Facebook SDK URL Handling
     // Add this function to handle URL redirects (e.g., from Facebook Login).

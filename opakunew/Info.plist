@@ -11,16 +11,16 @@
       <dict>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>fb3308747519281317</string>
+        <string>fb2512670979066687</string>
       </array>
       </dict>
     </array>
     <key>FacebookAppID</key>
-    <string>3308747519281317</string>
+    <string>2512670979066687</string>
     <key>FacebookClientToken</key>
-    <string>7e35ea453e4e6fb222b85394986d5d4b</string>
+    <string>0ef3aa8cadeb46764d845675204cbc0f</string>
     <key>FacebookDisplayName</key>
-    <string>Asteriks</string>
+    <string>Opaku</string>
     <key>LSApplicationQueriesSchemes</key>
     <array>
       <string>fbapi</string>
